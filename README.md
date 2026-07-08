@@ -62,8 +62,7 @@ RAG, absorbing neighbouring regions whose plane normal is near-parallel to the
 seed's. The union of accepted regions is the ground mask.
 
 Keeping superpixel structure through the pipeline means planarity propagates
-along genuinely adjacent surfaces instead of leaking across the pixel grid — the
-same structure-preserving idea that motivates the rest of my later work.
+along genuinely adjacent surfaces instead of leaking across the pixel grid.
 
 ## Results
 
@@ -101,9 +100,23 @@ Ground-plane estimates on indoor corridor scenes:
 The estimate stays stable across consecutive video frames, including under
 strong shadow patterns:
 
-![Video frames 1](results/video_1_frames.png)
-
-![Video frames 2](results/video_2_frames.png)
+<table>
+  <tr>
+    <th>Frame 1</th>
+    <th>Frame 2</th>
+    <th>Frame 3</th>
+  </tr>
+  <tr>
+    <td align="center"><img src="results/video1_frame1.png" width="266"/></td>
+    <td align="center"><img src="results/video1_frame2.png" width="266"/></td>
+    <td align="center"><img src="results/video1_frame3.png" width="266"/></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="results/video2_frame1.png" width="266"/></td>
+    <td align="center"><img src="results/video2_frame2.png" width="266"/></td>
+    <td align="center"><img src="results/video2_frame3.png" width="266"/></td>
+  </tr>
+</table>
 
 ## Usage
 
