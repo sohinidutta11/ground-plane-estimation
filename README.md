@@ -144,4 +144,4 @@ See `requirements.txt`. Note the code targets the older scikit-image RAG API
 ## Notes
 
 Undergraduate research project (UGRP), IIT Madras. Code and method by the
-repository author. Advised by Prof. Manivannan (confirm before publishing).
+repository author. Advised by Prof. Manivannan.
