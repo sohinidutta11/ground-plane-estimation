@@ -1,0 +1,16 @@
+# input media and generated outputs
+input/
+output/
+*.mp4
+*.avi
+
+# python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+
+# model weight caches
+*.pt
