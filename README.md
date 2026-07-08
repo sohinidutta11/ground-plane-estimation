@@ -15,6 +15,11 @@ raw pixels.
 2. **Superpixels + region graph.** Over-segment with SLIC, build a boundary
    Region Adjacency Graph (RAG), and hierarchically merge regions separated only
    by weak boundaries into larger surface patches.
+
+   ![SLIC segmentation](results/slic_segmentation.png)
+
+   ![RAG merging](results/rag_merging.png)
+
 3. **Per-region plane fitting.** Lift each region's pixels to 3D
    `(row, col, depth)` and fit a plane by SVD; the plane normal is the direction
    of least variance.
@@ -26,6 +31,36 @@ raw pixels.
 Keeping superpixel structure through the pipeline means planarity propagates
 along genuinely adjacent surfaces instead of leaking across the pixel grid — the
 same structure-preserving idea that motivates the rest of my later work.
+
+## Results
+
+The pipeline, stage by stage — SLIC over-segmentation, hierarchical RAG merging,
+coplanar region growing, the resulting binary mask, and the final ground-plane
+overlay:
+
+![Pipeline stages](results/pipeline.png)
+
+Ground-plane estimates on indoor corridor scenes (input → detected ground in
+green):
+
+![Ground plane examples](results/ground_plane_examples.jpg)
+
+![More ground plane examples](results/ground_plane_examples_2.jpg)
+
+The estimate stays stable across consecutive video frames:
+
+![Video frames](results/video_frames.jpg)
+
+Depth backbone comparison (MiDaS Large / Hybrid / Small). Hybrid was chosen as
+the accuracy-vs-speed trade-off:
+
+![MiDaS depth comparison](results/depth_comparison.jpg)
+
+| MiDaS model | avg. inference time (s) |
+| ----------- | ----------------------- |
+| Small       | 0.1184                  |
+| Hybrid      | 0.2269                  |
+| Large       | 0.4022                  |
 
 ## Usage
 
