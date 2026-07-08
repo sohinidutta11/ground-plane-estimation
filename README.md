@@ -10,23 +10,56 @@ raw pixels.
 
 ## Method
 
-1. **Monocular depth (MiDaS).** Estimate a relative inverse-depth map from a
-   single image.
-2. **Superpixels + region graph.** Over-segment with SLIC, build a boundary
-   Region Adjacency Graph (RAG), and hierarchically merge regions separated only
-   by weak boundaries into larger surface patches.
+### 1. Monocular depth (MiDaS)
 
-   ![SLIC segmentation](results/slic_segmentation.png)
+Estimate a relative inverse-depth map from the single input image. Three MiDaS
+backbones were compared; **Hybrid** was chosen as the accuracy-vs-speed
+trade-off.
 
-   ![RAG merging](results/rag_merging.png)
+<table>
+  <tr>
+    <td align="center"><img src="results/midas_demo_img.png" width="400"/><br/><em>Input image</em></td>
+    <td align="center"><img src="results/midas_small.png" width="400"/><br/><em>MiDaS Small</em></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="results/midas_hybrid.png" width="400"/><br/><em>MiDaS Hybrid</em></td>
+    <td align="center"><img src="results/midas_large.png" width="400"/><br/><em>MiDaS Large</em></td>
+  </tr>
+</table>
 
-3. **Per-region plane fitting.** Lift each region's pixels to 3D
-   `(row, col, depth)` and fit a plane by SVD; the plane normal is the direction
-   of least variance.
-4. **Region growing over the graph.** Seed from the bottom-centre region
-   (assumed ground) and run a BFS across the RAG, absorbing neighbouring regions
-   whose plane normal is near-parallel to the seed's. The union of accepted
-   regions is the ground mask.
+| MiDaS model | avg. inference time (s) |
+| ----------- | ----------------------- |
+| Small       | 0.1184                  |
+| Hybrid      | 0.2269                  |
+| Large       | 0.4022                  |
+
+### 2. Superpixels + region graph
+
+Over-segment with SLIC, build a boundary Region Adjacency Graph (RAG), and
+hierarchically merge regions separated only by weak boundaries into larger
+surface patches.
+
+<table>
+  <tr>
+    <td align="center"><img src="results/SLIC_orig_img.png" width="400"/><br/><em>Original image</em></td>
+    <td align="center"><img src="results/SLIC_Seg_600_seg_img.png" width="400"/><br/><em>SLIC segmentation (600 superpixels)</em></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="results/RAG_weighted_edges.png" width="400"/><br/><em>RAG with weighted edges</em></td>
+    <td align="center"><img src="results/After_merging_RAG.png" width="400"/><br/><em>After hierarchical merging</em></td>
+  </tr>
+</table>
+
+### 3. Per-region plane fitting
+
+Lift each region's pixels to 3D `(row, col, depth)` and fit a plane by SVD; the
+plane normal is the direction of least variance.
+
+### 4. Region growing over the graph
+
+Seed from the bottom-centre region (assumed ground) and run a BFS across the
+RAG, absorbing neighbouring regions whose plane normal is near-parallel to the
+seed's. The union of accepted regions is the ground mask.
 
 Keeping superpixel structure through the pipeline means planarity propagates
 along genuinely adjacent surfaces instead of leaking across the pixel grid — the
@@ -34,33 +67,43 @@ same structure-preserving idea that motivates the rest of my later work.
 
 ## Results
 
-The pipeline, stage by stage — SLIC over-segmentation, hierarchical RAG merging,
-coplanar region growing, the resulting binary mask, and the final ground-plane
+The pipeline, stage by stage — SLIC over-segmentation, hierarchical merging,
+coplanar region merging, the resulting binary mask, and the final ground-plane
 overlay:
 
 ![Pipeline stages](results/pipeline.png)
 
-Ground-plane estimates on indoor corridor scenes (input → detected ground in
-green):
+Ground-plane estimates on indoor corridor scenes:
 
-![Ground plane examples](results/ground_plane_examples.jpg)
+<table>
+  <tr>
+    <th>Input</th>
+    <th>Ground-plane estimate</th>
+  </tr>
+  <tr>
+    <td align="center"><img src="results/image1.png" width="400"/></td>
+    <td align="center"><img src="results/image1_est.png" width="400"/></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="results/image2.png" width="400"/></td>
+    <td align="center"><img src="results/image2_est.png" width="400"/></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="results/image3.png" width="400"/></td>
+    <td align="center"><img src="results/image3_est.png" width="400"/></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="results/image4.png" width="400"/></td>
+    <td align="center"><img src="results/image4_est.png" width="400"/></td>
+  </tr>
+</table>
 
-![More ground plane examples](results/ground_plane_examples_2.jpg)
+The estimate stays stable across consecutive video frames, including under
+strong shadow patterns:
 
-The estimate stays stable across consecutive video frames:
+![Video frames 1](results/video_1_frames.png)
 
-![Video frames](results/video_frames.jpg)
-
-Depth backbone comparison (MiDaS Large / Hybrid / Small). Hybrid was chosen as
-the accuracy-vs-speed trade-off:
-
-![MiDaS depth comparison](results/depth_comparison.jpg)
-
-| MiDaS model | avg. inference time (s) |
-| ----------- | ----------------------- |
-| Small       | 0.1184                  |
-| Hybrid      | 0.2269                  |
-| Large       | 0.4022                  |
+![Video frames 2](results/video_2_frames.png)
 
 ## Usage
 
